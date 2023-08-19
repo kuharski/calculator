@@ -1,24 +1,79 @@
-import logo from './logo.svg';
-import './App.css';
+import { useReducer } from 'react';
+import DigitButton from './DigitButton';
+import OperationButton from './OperationButton';
+import './styles.css';
+
+export const ACTIONS = {
+    ADD_DIGIT : 'add-digit',
+    CHOOSE_OPERATION: 'choose-operation',
+    CLEAR: 'clear',
+    DELETE_DIGIT: 'delete-digit',
+    EVALUATE: 'evaluate'
+}
+
+function reducer(state, { type, payload }) {
+
+    // eslint-disable-next-line default-case
+    switch(type) {
+        case ACTIONS.ADD_DIGIT:
+            if(payload === '0' && state.currentOperand === '0') {
+                return state;
+            }
+            else if(payload !== '0' && state.currentOperand === '0') {
+                return {
+                    ...state,
+                    currentOperand: `${payload}`
+                }
+            }
+            else if(payload === '.' && state.currentOperand.includes('.')) {
+                return state;
+            }
+            else {
+                return {
+                    ...state,
+                    currentOperand: `${state.currentOperand || ""}${payload}`,
+                }
+            }
+        case ACTIONS.CLEAR:
+            return {};
+        case ACTIONS.CHOOSE_OPERATION:
+            if (state.currentOperand == null && state.previousOperand == null) {
+                return state
+            }
+
+    }
+}
 
 function App() {
+  const [{ currentOperand, previousOperand, operation }, dispatch] = useReducer(reducer, {});
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className='main'>
+      <div className="calculator-grid">
+        <div className="output">
+          <div className="previous-operand">{previousOperand} {operation}</div>
+          <div className="current-operand">{currentOperand}</div>
+        </div>
+        <button className="span-two" onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
+        <button>DEL</button>
+        <OperationButton operation='÷' dispatch={dispatch} />
+        <DigitButton digit='1' dispatch={dispatch} />
+        <DigitButton digit='2' dispatch={dispatch} />
+        <DigitButton digit='3' dispatch={dispatch} />
+        <OperationButton operation='*' dispatch={dispatch} />
+        <DigitButton digit='4' dispatch={dispatch} />
+        <DigitButton digit='5' dispatch={dispatch} />
+        <DigitButton digit='6' dispatch={dispatch} />
+        <OperationButton operation='+' dispatch={dispatch} />
+        <DigitButton digit='7' dispatch={dispatch} />
+        <DigitButton digit='8' dispatch={dispatch} />
+        <DigitButton digit='9' dispatch={dispatch} />
+        <OperationButton operation='-' dispatch={dispatch} />
+        <DigitButton digit='.' dispatch={dispatch} />
+        <DigitButton digit='0' dispatch={dispatch} />
+        <button className="span-two">=</button>
+      </div>
+    </main>
   );
 }
 
