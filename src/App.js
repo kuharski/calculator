@@ -2,6 +2,13 @@ import { useReducer } from 'react';
 import DigitButton from './DigitButton';
 import OperationButton from './OperationButton';
 import './styles.css';
+import { create, all } from 'mathjs'
+
+const config = {
+    number: 'number',
+    precision: 64,
+  }
+  const math = create(all, config);
 
 export const ACTIONS = {
     ADD_DIGIT : 'add-digit',
@@ -22,7 +29,7 @@ function reducer(state, { type, payload }) {
             else if(payload !== '0' && state.currentOperand === '0') {
                 return {
                     ...state,
-                    currentOperand: `${payload}`
+                    currentOperand: payload
                 }
             }
             else if(payload === '.' && state.currentOperand.includes('.')) {
@@ -40,7 +47,22 @@ function reducer(state, { type, payload }) {
             if (state.currentOperand == null && state.previousOperand == null) {
                 return state
             }
-
+            else if (state.previousOperand == null) {
+                return {
+                    ...state,
+                    operation: payload,
+                    previousOperand: state.currentOperand,
+                    currentOperand: null,
+                }
+            }
+            else {
+                return {
+                    ...state,
+                    previousOperand: math.evaluate(`${state.previousOperand} ${state.operation} ${state.currentOperand}`),
+                    operation: payload,
+                    currentOperand: null,
+                }
+            }
     }
 }
 
